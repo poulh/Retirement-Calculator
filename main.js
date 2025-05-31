@@ -36,23 +36,28 @@ function updateTable() {
     let yearsUntilDepletion = 0;
 
     for (let year = 0; year < planningYears; year++) {
-        const rentalGrowthRate = Math.max(0, inflationRate - 0.01);
-        const rentalIncome = initialAdditionalIncome * Math.pow(1 + rentalGrowthRate, year);
+        const additionalIncomeGrowthRate = Math.max(0, inflationRate);
+        const additionalIncome = initialAdditionalIncome * Math.pow(1 + additionalIncomeGrowthRate, year);
 
+        // Calculate market gains first
+        const marketGains = portfolioValue * stockReturn;
+        const portfolioAfterGains = portfolioValue + marketGains;
+
+        // Now calculate withdrawal based on portfolio after gains
         const stockWithdrawal = Math.min(
             firstYearWithdrawal * Math.pow(1 + inflationRate, year),
-            portfolioValue
+            portfolioAfterGains
         );
 
-        const totalIncome = stockWithdrawal + rentalIncome;
+        const totalIncome = stockWithdrawal + additionalIncome;
 
         totalWithdrawn += stockWithdrawal;
 
         const row = document.createElement('tr');
 
-        const marketGains = portfolioValue * stockReturn;
+        // Net change and portfolio after withdrawal
         const netChange = marketGains - stockWithdrawal;
-        const portfolioAfterWithdrawal = Math.max(0, portfolioValue + netChange);
+        const portfolioAfterWithdrawal = Math.max(0, portfolioAfterGains - stockWithdrawal);
 
         row.innerHTML = `
             <td>${currentYear + year}</td>
@@ -61,14 +66,14 @@ function updateTable() {
             <td>${formatCurrency(portfolioValue)}</td>
             <td class="${marketGains >= 0 ? '' : 'negative'}">${formatCurrency(marketGains)}</td>
             <td>${formatCurrency(stockWithdrawal)}</td>
-            <td>${formatCurrency(rentalIncome)}</td>
+            <td>${formatCurrency(additionalIncome)}</td>
             <td style="font-weight: bold; color: #2d3748;">${formatCurrency(totalIncome)}</td>
-            <td class="${portfolioAfterWithdrawal < 100000 ? 'negative' : ''}">${formatCurrency(portfolioAfterWithdrawal)}</td>
+            <td class="${portfolioAfterWithdrawal < stockWithdrawal ? 'negative' : ''}">${formatCurrency(portfolioAfterWithdrawal)}</td>
         `;
 
         tableBody.appendChild(row);
 
-        if (portfolioAfterWithdrawal < 100000 && yearsUntilDepletion === 0) {
+        if (portfolioAfterWithdrawal < stockWithdrawal && yearsUntilDepletion === 0) {
             yearsUntilDepletion = year + 1;
         }
 
