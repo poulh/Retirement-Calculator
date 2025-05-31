@@ -127,10 +127,33 @@ function updateTable() {
     const realStockReturn = stockReturn - inflationRate;
     const impliedWithdrawalRate = firstYearWithdrawal / initialValue;
 
+    let depletionTitle, depletionYear, yourAgeAtDepletion, spouseAgeAtDepletion;
+
+    if (yearsUntilDepletion) {
+        // Portfolio depletes
+        depletionTitle = "Years Until Stock Depletion";
+        depletionYear = currentYear + yearsUntilDepletion - 1;
+        yourAgeAtDepletion = yourAge + yearsUntilDepletion - 1;
+        spouseAgeAtDepletion = spouseAge + yearsUntilDepletion - 1;
+    } else {
+        // Portfolio survives
+        depletionTitle = "Portfolio Survives";
+        // Last year either spouse is alive
+        depletionYear = currentYear + planningYears - 1;
+        yourAgeAtDepletion = '-';
+        spouseAgeAtDepletion = '-';
+    }
+
     summary.innerHTML = `
-        <div class="summary-card">
-            <h4>Years Until Stock Depletion</h4>
+        <div class="summary-card" style="background: ${realStockReturn * 100 > impliedWithdrawalRate * 100 ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #e53e3e, #c53030)'};">
+
+            <h4>${depletionTitle}</h4>
             <div class="value">${yearsUntilDepletion || planningYears + '+'}</div>
+            <div style="font-size:0.95em;">
+                Year: ${depletionYear}<br>
+                Your Age: ${yourAgeAtDepletion}<br>
+                Spouse's Age: ${spouseAgeAtDepletion}
+            </div>
         </div>
         <div class="summary-card">
             <h4>Planning Horizon</h4>
