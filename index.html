@@ -16,6 +16,9 @@
                 <li><strong>Planning Horizon:</strong> Projection runs until the later of your or your spouse's life expectancy</li>
                 <li><strong>Stock Withdrawal Strategy:</strong> Fixed first-year amount, adjusted annually for inflation</li>
                 <li><strong>Additional Income Growth:</strong> Increases based on inflation</li>
+                <li><strong>Social Security Benefits:</strong> Entered in today's dollars they are adjusted for inflation</li>
+                <li><strong>Death of Spouse:</strong> Surviving spouse receives the max SSN benefit of either spouse</li>
+
             </ul>
         </div>
 
@@ -25,16 +28,32 @@
                 <input type="number" id="yourAge" value="48" step="1" min="18" max="120">
             </div>
             <div class="control-group">
-                <label>Spouse's Age</label>
-                <input type="number" id="spouseAge" value="40" step="1" min="18" max="120">
+                <label>Your Retirement Age</label>
+                <input type="number" id="yourRetirementAge" value="65" step="1" min="62" max="70">
             </div>
             <div class="control-group">
                 <label>Your Life Expectancy</label>
                 <input type="number" id="yourLifeExpectancy" value="90" step="1" min="60" max="120">
             </div>
             <div class="control-group">
+                <label>Your Social Security (monthly, $)</label>
+                <input type="number" id="yourSSN" value="2000" step="100" min="0">
+            </div>
+            <div class="control-group">
+                <label>Spouse's Age</label>
+                <input type="number" id="spouseAge" value="40" step="1" min="18" max="120">
+            </div>
+            <div class="control-group">
+                <label>Spouse's Retirement Age</label>
+                <input type="number" id="spouseRetirementAge" value="65" step="1" min="62" max="70">
+            </div>
+            <div class="control-group">
                 <label>Spouse's Life Expectancy</label>
                 <input type="number" id="spouseLifeExpectancy" value="100" step="1" min="60" max="120">
+            </div>
+            <div class="control-group">
+                <label>Spouse's Social Security (monthly, $)</label>
+                <input type="number" id="spouseSSN" value="2000" step="100" min="0">
             </div>
             <div class="control-group">
                 <label>Initial Stock Portfolio</label>
@@ -70,6 +89,7 @@
                         <th>Stock Market Gains</th>
                         <th>Stock Withdrawal</th>
                         <th>Additional Income</th>
+                        <th>Social Security</th>
                         <th>Total Annual Income</th>
                         <th>Portfolio After Withdrawal</th>
                     </tr>

@@ -10,6 +10,10 @@ function formatCurrency(amount) {
 function updateTable() {
     const yourAge = parseInt(document.getElementById('yourAge').value);
     const spouseAge = parseInt(document.getElementById('spouseAge').value);
+    const yourRetirementAge = parseInt(document.getElementById('yourRetirementAge').value);
+    const spouseRetirementAge = parseInt(document.getElementById('spouseRetirementAge').value);
+    const yourSSN = parseFloat(document.getElementById('yourSSN').value) * 12; // yearly
+    const spouseSSN = parseFloat(document.getElementById('spouseSSN').value) * 12; // yearly
     const yourLifeExpectancy = parseInt(document.getElementById('yourLifeExpectancy').value);
     const spouseLifeExpectancy = parseInt(document.getElementById('spouseLifeExpectancy').value);
     const initialValue = parseFloat(document.getElementById('initialValue').value);
@@ -18,7 +22,6 @@ function updateTable() {
     const initialAdditionalIncome = parseFloat(document.getElementById('additionalIncome').value);
     const stockReturn = parseFloat(document.getElementById('stockReturn').value) / 100;
 
-    // Calculate years left for each person
     const yourYearsLeft = yourLifeExpectancy - yourAge + 1;
     const spouseYearsLeft = spouseLifeExpectancy - spouseAge + 1;
     const planningYears = Math.max(yourYearsLeft, spouseYearsLeft);
@@ -39,6 +42,32 @@ function updateTable() {
         const additionalIncomeGrowthRate = Math.max(0, inflationRate);
         const additionalIncome = initialAdditionalIncome * Math.pow(1 + additionalIncomeGrowthRate, year);
 
+        // Calculate ages for this year
+        const thisYourAge = currentYourAge + year;
+        const thisSpouseAge = currentSpouseAge + year;
+
+        // Social Security: Only after each person's retirement age and before their life expectancy
+        let ssnIncome = 0;
+        const yourEligible = thisYourAge >= yourRetirementAge && thisYourAge <= yourLifeExpectancy;
+        const spouseEligible = thisSpouseAge >= spouseRetirementAge && thisSpouseAge <= spouseLifeExpectancy;
+        const yourSSNInfl = yourSSN * Math.pow(1 + inflationRate, year);
+        const spouseSSNInfl = spouseSSN * Math.pow(1 + inflationRate, year);
+
+        if (yourEligible && spouseEligible) {
+            // Both alive and eligible: sum both
+            ssnIncome = yourSSNInfl + spouseSSNInfl;
+        } else if (yourEligible && !spouseEligible && thisSpouseAge > spouseLifeExpectancy) {
+            // Spouse has died, survivor gets higher benefit
+            ssnIncome = Math.max(yourSSNInfl, spouseSSNInfl);
+        } else if (!yourEligible && spouseEligible && thisYourAge > yourLifeExpectancy) {
+            // You have died, survivor gets higher benefit
+            ssnIncome = Math.max(yourSSNInfl, spouseSSNInfl);
+        } else if (yourEligible) {
+            ssnIncome = yourSSNInfl;
+        } else if (spouseEligible) {
+            ssnIncome = spouseSSNInfl;
+        }
+
         // Calculate market gains first
         const marketGains = portfolioValue * stockReturn;
         const portfolioAfterGains = portfolioValue + marketGains;
@@ -49,7 +78,7 @@ function updateTable() {
             portfolioAfterGains
         );
 
-        const totalIncome = stockWithdrawal + additionalIncome;
+        const totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
 
         totalWithdrawn += stockWithdrawal;
 
@@ -67,6 +96,7 @@ function updateTable() {
             <td class="${marketGains >= 0 ? '' : 'negative'}">${formatCurrency(marketGains)}</td>
             <td>${formatCurrency(stockWithdrawal)}</td>
             <td>${formatCurrency(additionalIncome)}</td>
+            <td>${formatCurrency(ssnIncome)}</td>
             <td style="font-weight: bold; color: #2d3748;">${formatCurrency(totalIncome)}</td>
             <td class="${portfolioAfterWithdrawal < stockWithdrawal ? 'negative' : ''}">${formatCurrency(portfolioAfterWithdrawal)}</td>
         `;
