@@ -39,6 +39,8 @@
                 <label>Your Social Security (monthly, $)</label>
                 <input type="number" id="yourSSN" value="2000" step="100" min="0">
             </div>
+        </div>
+        <div class="controls">
             <div class="control-group">
                 <label>Spouse's Age</label>
                 <input type="number" id="spouseAge" value="40" step="1" min="18" max="120">
@@ -55,6 +57,8 @@
                 <label>Spouse's Social Security (monthly, $)</label>
                 <input type="number" id="spouseSSN" value="2000" step="100" min="0">
             </div>
+        </div>
+        <div class="controls">
             <div class="control-group">
                 <label>Initial Stock Portfolio</label>
                 <input type="number" id="initialValue" value="1500000" step="100000">
@@ -64,16 +68,18 @@
                 <input type="number" id="firstYearWithdrawal" value="100000" step="10000">
             </div>
             <div class="control-group">
+                <label>Stock Return (%)</label>
+                <input type="number" id="stockReturn" value="7" step="0.1">
+            </div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
                 <label>Inflation Rate (%)</label>
                 <input type="number" id="inflationRate" value="3" step="0.1" min="0" max="10">
             </div>
             <div class="control-group">
                 <label>Additional Income (Rentals, etc)</label>
                 <input type="number" id="additionalIncome" value="0" step="1000">
-            </div>
-            <div class="control-group">
-                <label>Stock Return (%)</label>
-                <input type="number" id="stockReturn" value="7" step="0.1">
             </div>
             <button onclick="updateTable()">Update Projection</button>
         </div>
