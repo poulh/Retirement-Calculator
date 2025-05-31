@@ -152,14 +152,22 @@
         <div class="assumptions">
             <h3>Key Assumptions</h3>
             <ul>
-                <li><strong>Current Age:</strong> You: 48, Wife: 40</li>
-                <li><strong>Planning Horizon:</strong> Based on wife's life expectancy setting</li>
+                <li><strong>Current Age:</strong> You: 48, Spouse: 40</li>
+                <li><strong>Planning Horizon:</strong> Based on spouse's life expectancy setting</li>
                 <li><strong>Stock Withdrawal Strategy:</strong> Fixed first-year amount, adjusted annually for inflation</li>
                 <li><strong>Rental Income Growth:</strong> Inflation - 1% annually</li>
             </ul>
         </div>
 
         <div class="controls">
+            <div class="control-group">
+                <label>Your Age</label>
+                <input type="number" id="yourAge" value="48" step="1" min="18" max="120">
+            </div>
+            <div class="control-group">
+                <label>Spouse's Age</label>
+                <input type="number" id="spouseAge" value="40" step="1" min="18" max="120">
+            </div>
             <div class="control-group">
                 <label>Initial Stock Portfolio</label>
                 <input type="number" id="initialValue" value="1500000" step="100000">
@@ -177,8 +185,8 @@
                 <input type="number" id="additionalIncome" value="10000" step="1000">
             </div>
             <div class="control-group">
-                <label>Wife's Life Expectancy</label>
-                <input type="number" id="wifeLifeExpectancy" value="100" step="1" min="80" max="110">
+                <label>Spouse's Life Expectancy</label>
+                <input type="number" id="spouseLifeExpectancy" value="100" step="1" min="80" max="110">
             </div>
             <div class="control-group">
                 <label>Stock Return (%)</label>
@@ -193,7 +201,7 @@
                     <tr>
                         <th>Year</th>
                         <th>Your Age</th>
-                        <th>Wife's Age</th>
+                        <th>Spouse's Age</th>
                         <th>Stock Portfolio Value</th>
                         <th>Stock Market Gains</th>
                         <th>Stock Withdrawal</th>
