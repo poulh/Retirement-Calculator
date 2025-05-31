@@ -21,6 +21,7 @@ function updateTable() {
     const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
     const initialAdditionalIncome = parseFloat(document.getElementById('additionalIncome').value);
     const stockReturn = parseFloat(document.getElementById('stockReturn').value) / 100;
+    const incomeCalcMode = document.getElementById('incomeCalcMode').value;
 
     const yourYearsLeft = yourLifeExpectancy - yourAge + 1;
     const spouseYearsLeft = spouseLifeExpectancy - spouseAge + 1;
@@ -46,7 +47,7 @@ function updateTable() {
         const thisYourAge = currentYourAge + year;
         const thisSpouseAge = currentSpouseAge + year;
 
-        // Social Security: Only after each person's retirement age and before their life expectancy
+        // Social Security calculation (as before)
         let ssnIncome = 0;
         const yourEligible = thisYourAge >= yourRetirementAge && thisYourAge <= yourLifeExpectancy;
         const spouseEligible = thisSpouseAge >= spouseRetirementAge && thisSpouseAge <= spouseLifeExpectancy;
@@ -54,13 +55,10 @@ function updateTable() {
         const spouseSSNInfl = spouseSSN * Math.pow(1 + inflationRate, year);
 
         if (yourEligible && spouseEligible) {
-            // Both alive and eligible: sum both
             ssnIncome = yourSSNInfl + spouseSSNInfl;
         } else if (yourEligible && !spouseEligible && thisSpouseAge > spouseLifeExpectancy) {
-            // Spouse has died, survivor gets higher benefit
             ssnIncome = Math.max(yourSSNInfl, spouseSSNInfl);
         } else if (!yourEligible && spouseEligible && thisYourAge > yourLifeExpectancy) {
-            // You have died, survivor gets higher benefit
             ssnIncome = Math.max(yourSSNInfl, spouseSSNInfl);
         } else if (yourEligible) {
             ssnIncome = yourSSNInfl;
@@ -72,13 +70,20 @@ function updateTable() {
         const marketGains = portfolioValue * stockReturn;
         const portfolioAfterGains = portfolioValue + marketGains;
 
-        // Now calculate withdrawal based on portfolio after gains
-        const stockWithdrawal = Math.min(
-            firstYearWithdrawal * Math.pow(1 + inflationRate, year),
-            portfolioAfterGains
-        );
-
-        const totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
+        // Calculate withdrawal and total income based on mode
+        let stockWithdrawal, totalIncome;
+        if (incomeCalcMode === 'add') {
+            stockWithdrawal = Math.min(
+                firstYearWithdrawal * Math.pow(1 + inflationRate, year),
+                portfolioAfterGains
+            );
+            totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
+        } else {
+            // Reduce stock withdrawal by other income, but never below 0
+            const targetIncome = firstYearWithdrawal * Math.pow(1 + inflationRate, year);
+            stockWithdrawal = Math.max(0, Math.min(targetIncome - additionalIncome - ssnIncome, portfolioAfterGains));
+            totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
+        }
 
         totalWithdrawn += stockWithdrawal;
 
@@ -94,9 +99,9 @@ function updateTable() {
             <td>${currentSpouseAge + year <= spouseLifeExpectancy ? currentSpouseAge + year : '-'}</td>
             <td>${formatCurrency(portfolioValue)}</td>
             <td class="${marketGains >= 0 ? '' : 'negative'}">${formatCurrency(marketGains)}</td>
-            <td>${formatCurrency(stockWithdrawal)}</td>
             <td>${formatCurrency(additionalIncome)}</td>
             <td>${formatCurrency(ssnIncome)}</td>
+            <td>${formatCurrency(stockWithdrawal)}</td>
             <td style="font-weight: bold; color: #2d3748;">${formatCurrency(totalIncome)}</td>
             <td class="${portfolioAfterWithdrawal < stockWithdrawal ? 'negative' : ''}">${formatCurrency(portfolioAfterWithdrawal)}</td>
         `;

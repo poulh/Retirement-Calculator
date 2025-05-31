@@ -81,6 +81,15 @@
                 <label>Additional Income (Rentals, etc)</label>
                 <input type="number" id="additionalIncome" value="0" step="1000">
             </div>
+        </div>
+        <div class="controls">
+            <div class="control-group">
+                <label>Total Annual Income Calculation</label>
+                <select id="incomeCalcMode">
+                    <option value="reduce">Reduce Stock Withdrawal by SSN & Additional Income (keep annual income consistent)</option>
+                    <option value="add">Add SSN & Additional Income to Stock Withdrawal (inrease annual income)</option>
+                </select>
+            </div>
             <button onclick="updateTable()">Update Projection</button>
         </div>
 
@@ -93,9 +102,9 @@
                         <th>Spouse's Age</th>
                         <th>Stock Portfolio Value</th>
                         <th>Stock Market Gains</th>
-                        <th>Stock Withdrawal</th>
                         <th>Additional Income</th>
                         <th>Social Security</th>
+                        <th>Stock Withdrawal</th>
                         <th>Total Annual Income</th>
                         <th>Portfolio After Withdrawal</th>
                     </tr>
