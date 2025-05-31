@@ -160,8 +160,8 @@ function updateTable() {
             <div class="value">${planningYears} years</div>
         </div>
         <div class="summary-card">
-            <h4>Total Stock Withdrawn</h4>
-            <div class="value">${formatCurrency(totalWithdrawn)}</div>
+            <h4>Inheritance Left to Heirs</h4>
+            <div class="value">${formatCurrency(portfolioValue)}</div>
         </div>
         <div class="summary-card" style="background: ${realStockReturn * 100 > impliedWithdrawalRate * 100 ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #e53e3e, #c53030)'};">
             <h4>Why Portfolio ${yearsUntilDepletion ? 'Depletes' : 'Survives'}</h4>
