@@ -22,6 +22,15 @@ function updateTable() {
     const initialAdditionalIncome = parseFloat(document.getElementById('additionalIncome').value);
     const stockReturn = parseFloat(document.getElementById('stockReturn').value) / 100;
     const incomeCalcMode = document.getElementById('incomeCalcMode').value;
+    const inflationAdjustMode = document.getElementById('inflationAdjustMode').value;
+
+    // Adjust rates if showing in today's dollars
+    let effectiveInflation = inflationRate;
+    let effectiveStockReturn = stockReturn;
+    if (inflationAdjustMode === 'today') {
+        effectiveStockReturn = stockReturn - inflationRate;
+        effectiveInflation = 0;
+    }
 
     const yourYearsLeft = yourLifeExpectancy - yourAge + 1;
     const spouseYearsLeft = spouseLifeExpectancy - spouseAge + 1;
@@ -40,7 +49,7 @@ function updateTable() {
     let yearsUntilDepletion = 0;
 
     for (let year = 0; year < planningYears; year++) {
-        const additionalIncomeGrowthRate = Math.max(0, inflationRate);
+        const additionalIncomeGrowthRate = Math.max(0, effectiveInflation);
         const additionalIncome = initialAdditionalIncome * Math.pow(1 + additionalIncomeGrowthRate, year);
 
         // Calculate ages for this year
@@ -51,8 +60,8 @@ function updateTable() {
         let ssnIncome = 0;
         const yourEligible = thisYourAge >= yourRetirementAge && thisYourAge <= yourLifeExpectancy;
         const spouseEligible = thisSpouseAge >= spouseRetirementAge && thisSpouseAge <= spouseLifeExpectancy;
-        const yourSSNInfl = yourSSN * Math.pow(1 + inflationRate, year);
-        const spouseSSNInfl = spouseSSN * Math.pow(1 + inflationRate, year);
+        const yourSSNInfl = yourSSN * Math.pow(1 + effectiveInflation, year);
+        const spouseSSNInfl = spouseSSN * Math.pow(1 + effectiveInflation, year);
 
         if (yourEligible && spouseEligible) {
             ssnIncome = yourSSNInfl + spouseSSNInfl;
@@ -67,20 +76,20 @@ function updateTable() {
         }
 
         // Calculate market gains first
-        const marketGains = portfolioValue * stockReturn;
+        const marketGains = portfolioValue * effectiveStockReturn;
         const portfolioAfterGains = portfolioValue + marketGains;
 
         // Calculate withdrawal and total income based on mode
         let stockWithdrawal, totalIncome;
         if (incomeCalcMode === 'add') {
             stockWithdrawal = Math.min(
-                firstYearWithdrawal * Math.pow(1 + inflationRate, year),
+                firstYearWithdrawal * Math.pow(1 + effectiveInflation, year),
                 portfolioAfterGains
             );
             totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
         } else {
             // Reduce stock withdrawal by other income, but never below 0
-            const targetIncome = firstYearWithdrawal * Math.pow(1 + inflationRate, year);
+            const targetIncome = firstYearWithdrawal * Math.pow(1 + effectiveInflation, year);
             stockWithdrawal = Math.max(0, Math.min(targetIncome - additionalIncome - ssnIncome, portfolioAfterGains));
             totalIncome = stockWithdrawal + additionalIncome + ssnIncome;
         }
@@ -95,8 +104,8 @@ function updateTable() {
 
         row.innerHTML = `
             <td>${currentYear + year}</td>
-            <td>${currentYourAge + year <= yourLifeExpectancy ? currentYourAge + year : '-'}</td>
-            <td>${currentSpouseAge + year <= spouseLifeExpectancy ? currentSpouseAge + year : '-'}</td>
+            <td>${thisYourAge <= yourLifeExpectancy ? thisYourAge : '-'}</td>
+            <td>${thisSpouseAge <= spouseLifeExpectancy ? thisSpouseAge : '-'}</td>
             <td>${formatCurrency(portfolioValue)}</td>
             <td class="${marketGains >= 0 ? '' : 'negative'}">${formatCurrency(marketGains)}</td>
             <td>${formatCurrency(additionalIncome)}</td>
