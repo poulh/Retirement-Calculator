@@ -10,15 +10,18 @@ function formatCurrency(amount) {
 function updateTable() {
     const yourAge = parseInt(document.getElementById('yourAge').value);
     const spouseAge = parseInt(document.getElementById('spouseAge').value);
+    const yourLifeExpectancy = parseInt(document.getElementById('yourLifeExpectancy').value);
+    const spouseLifeExpectancy = parseInt(document.getElementById('spouseLifeExpectancy').value);
     const initialValue = parseFloat(document.getElementById('initialValue').value);
     const firstYearWithdrawal = parseFloat(document.getElementById('firstYearWithdrawal').value);
     const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
     const initialAdditionalIncome = parseFloat(document.getElementById('additionalIncome').value);
     const stockReturn = parseFloat(document.getElementById('stockReturn').value) / 100;
-    const spouseLifeExpectancy = parseInt(document.getElementById('spouseLifeExpectancy').value);
 
-    const planningYears = spouseLifeExpectancy - spouseAge + 1; // Use input spouse's age
-    console.log(`Planning for ${planningYears} years until wife's life expectancy of ${spouseLifeExpectancy}`);
+    // Calculate years left for each person
+    const yourYearsLeft = yourLifeExpectancy - yourAge + 1;
+    const spouseYearsLeft = spouseLifeExpectancy - spouseAge + 1;
+    const planningYears = Math.max(yourYearsLeft, spouseYearsLeft);
 
     const tableBody = document.getElementById('tableBody');
     const summary = document.getElementById('summary');
@@ -33,11 +36,9 @@ function updateTable() {
     let yearsUntilDepletion = 0;
 
     for (let year = 0; year < planningYears; year++) {
-        // Rental income grows at inflation - 1%
         const rentalGrowthRate = Math.max(0, inflationRate - 0.01);
         const rentalIncome = initialAdditionalIncome * Math.pow(1 + rentalGrowthRate, year);
 
-        // Stock withdrawal grows with inflation
         const stockWithdrawal = Math.min(
             firstYearWithdrawal * Math.pow(1 + inflationRate, year),
             portfolioValue
@@ -49,15 +50,14 @@ function updateTable() {
 
         const row = document.createElement('tr');
 
-        // Calculate market gains and net change
         const marketGains = portfolioValue * stockReturn;
         const netChange = marketGains - stockWithdrawal;
         const portfolioAfterWithdrawal = Math.max(0, portfolioValue + netChange);
-        console.log(`Year ${currentYear + year}: Portfolio after withdrawal: ${portfolioAfterWithdrawal}, Market gains: ${marketGains}, Stock withdrawal: ${stockWithdrawal}, Rental income: ${rentalIncome}`);
+
         row.innerHTML = `
             <td>${currentYear + year}</td>
-            <td>${currentYourAge + year}</td>
-            <td>${currentSpouseAge + year}</td>
+            <td>${currentYourAge + year <= yourLifeExpectancy ? currentYourAge + year : '-'}</td>
+            <td>${currentSpouseAge + year <= spouseLifeExpectancy ? currentSpouseAge + year : '-'}</td>
             <td>${formatCurrency(portfolioValue)}</td>
             <td class="${marketGains >= 0 ? '' : 'negative'}">${formatCurrency(marketGains)}</td>
             <td>${formatCurrency(stockWithdrawal)}</td>
@@ -73,14 +73,11 @@ function updateTable() {
         }
 
         portfolioValue = portfolioAfterWithdrawal;
-
     }
 
-    // Calculate the real issue
-    const realStockReturn = stockReturn - inflationRate; // Real return after inflation
+    const realStockReturn = stockReturn - inflationRate;
     const impliedWithdrawalRate = firstYearWithdrawal / initialValue;
 
-    // Update summary
     summary.innerHTML = `
         <div class="summary-card">
             <h4>Years Until Stock Depletion</h4>
