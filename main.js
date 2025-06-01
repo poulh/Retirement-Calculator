@@ -145,14 +145,14 @@ function updateTable() {
     }
 
     summary.innerHTML = `
-        <div class="summary-card" style="background: ${realStockReturn * 100 > impliedWithdrawalRate * 100 ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #e53e3e, #c53030)'};">
+        <div class="summary-card" style="background: ${yearsUntilDepletion === 0 ? 'linear-gradient(135deg, #48bb78, #38a169)' : 'linear-gradient(135deg, #e53e3e, #c53030)'};">
 
             <h4>${depletionTitle}</h4>
             <div class="value">${yearsUntilDepletion || planningYears + '+'}</div>
             <div style="font-size:0.95em;">
                 Year: ${depletionYear}<br>
-                Your Age: ${yourAgeAtDepletion}<br>
-                Spouse's Age: ${spouseAgeAtDepletion}
+                Your Age: ${yourAgeAtDepletion <= yourLifeExpectancy ? yourAgeAtDepletion : '-'}<br>
+                Spouse's Age: ${spouseAgeAtDepletion <= spouseLifeExpectancy ? spouseAgeAtDepletion : '-'}
             </div>
         </div>
         <div class="summary-card">
